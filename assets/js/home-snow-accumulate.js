@@ -404,6 +404,18 @@
     }
   }
 
+  function warmFallDelaySeconds(baseDelay, fallDuration, durationScale, flakeIndex) {
+    var period = Math.max((fallDuration || 8) * durationScale, 1);
+    var base = isNaN(baseDelay) ? 0 : baseDelay;
+    /* W3Bits staggers first cycle up to ~19s — negative delay starts mid-fall on load. */
+    var offset = (base + flakeIndex * 1.7) * durationScale;
+    var warm = -(offset % period);
+    if (warm === 0 && base > 0) {
+      warm = -0.01;
+    }
+    return warm;
+  }
+
   function applyFlakeMotion() {
     var durationScale = parseFloat(
       getComputedStyle(document.documentElement).getPropertyValue("--snow-fall-speed")
@@ -419,13 +431,10 @@
       var fallName = s.animationName.split(",")[0].trim();
       var dur = parseFloat(s.animationDuration);
       var del = parseFloat(s.animationDelay);
-      var fallDur =
-        dur && durationScale !== 1
-          ? dur * durationScale + "s"
-          : dur
-            ? dur + "s"
-            : s.animationDuration;
-      var fallDel = !isNaN(del) ? del + "s" : s.animationDelay;
+      var fallDurSec = dur ? dur * durationScale : 8 * durationScale;
+      var fallDur = fallDurSec + "s";
+      var fallDelSec = warmFallDelaySeconds(del, dur, durationScale, idx);
+      var fallDel = fallDelSec + "s";
 
       if (mobile) {
         el.style.animationName = fallName;
