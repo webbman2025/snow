@@ -18,6 +18,8 @@ Shortcuts:
 
 **GitHub:** https://github.com/webbman2025/snow
 
+**Developer handoff (production integration):** see [`SNOW-DEV-HANDOFF.md`](./SNOW-DEV-HANDOFF.md) — share that file + the repo link with web/platform; do not ask them to replace `www.three.com.hk` HTML with the UAT zip.
+
 ## Local preview
 
 ```bash
