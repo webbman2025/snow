@@ -4,17 +4,19 @@ Static deploy of the Christmas homepage with snowfall, snow-pile scrub, and shov
 
 ## Live URLs
 
-After deploy, use your Vercel production URL:
+**Production:** https://snow-flame-kappa.vercel.app
 
-| Page | Path |
-|------|------|
-| Day (default snow) | `/christmas/home.html` |
-| Night sky + stars | `/christmas/home2.html` |
+| Page | URL |
+|------|-----|
+| Day (default snow) | https://snow-flame-kappa.vercel.app/christmas/home.html |
+| Night sky + stars | https://snow-flame-kappa.vercel.app/christmas/home2.html |
 
-Shortcuts (same pages):
+Shortcuts:
 
-- `/home.html`
-- `/home2.html`
+- https://snow-flame-kappa.vercel.app/home.html
+- https://snow-flame-kappa.vercel.app/home2.html
+
+**GitHub:** https://github.com/webbman2025/snow
 
 ## Local preview
 
