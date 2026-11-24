@@ -1,0 +1,119 @@
+/* Snow pile — CSS layers + home-snow-accumulate.js (clip-path from flake bins) */
+:root {
+  --snow-pile-height: 0px;
+  --snow-pile-max-vh: 5;
+  --snow-fill: 0;
+  /* 1 = W3Bits default; >1 slows fall duration only. 2 = 50% slower. */
+  --snow-fall-speed: 2;
+  --snow-sway-px: 26px;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --snow-fall-speed: 2;
+    --snow-sway-px: 14px;
+  }
+}
+
+@keyframes snow-sway {
+  0% {
+    margin-left: 0;
+  }
+  20% {
+    margin-left: calc(var(--snow-sway-px) * -0.95);
+  }
+  45% {
+    margin-left: calc(var(--snow-sway-px) * 0.88);
+  }
+  68% {
+    margin-left: calc(var(--snow-sway-px) * -0.72);
+  }
+  88% {
+    margin-left: calc(var(--snow-sway-px) * 0.42);
+  }
+  100% {
+    margin-left: 0;
+  }
+}
+
+@keyframes snow-sway-b {
+  0% {
+    margin-left: 0;
+  }
+  18% {
+    margin-left: calc(var(--snow-sway-px) * 0.82);
+  }
+  42% {
+    margin-left: calc(var(--snow-sway-px) * -0.9);
+  }
+  64% {
+    margin-left: calc(var(--snow-sway-px) * 0.58);
+  }
+  86% {
+    margin-left: calc(var(--snow-sway-px) * -0.35);
+  }
+  100% {
+    margin-left: 0;
+  }
+}
+
+#snow-pile.snow-pile {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0;
+  z-index: 10000;
+  pointer-events: none;
+  overflow: hidden;
+  will-change: height, clip-path;
+  opacity: 1;
+  background: linear-gradient(
+    to bottom,
+    #b7d4e6 0%,
+    #d5e8f3 28%,
+    #eaf4f9 100%
+  );
+}
+
+#snow-pile.snow-pile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    #b7d4e6 0%,
+    #d5e8f3 28%,
+    #eaf4f9 100%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #snow-pile.snow-pile {
+    display: none;
+  }
+}
+
+html.snow-shovel-cursor,
+html.snow-shovel-cursor * {
+  cursor: url("../images/snow-shovel-cursor.png?v=2") 30 94, default !important;
+}
+
+#snow-finger-shovel {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 70px;
+  height: 130px;
+  z-index: 10001;
+  display: none;
+  pointer-events: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  will-change: transform;
+}
+
+#snow-finger-shovel.is-on {
+  display: block;
+}

@@ -1,0 +1,18 @@
+{
+  "version": 2,
+  "rewrites": [
+    { "source": "/", "destination": "/christmas/home.html" },
+    { "source": "/home.html", "destination": "/christmas/home.html" },
+    { "source": "/home2.html", "destination": "/christmas/home2.html" },
+    { "source": "/christmas", "destination": "/christmas/index.html" },
+    { "source": "/christmas/", "destination": "/christmas/index.html" },
+    { "source": "/christmas/home", "destination": "/christmas/index.html" },
+    { "source": "/christmas/home.html", "destination": "/christmas/index.html" }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    }
+  ]
+}
