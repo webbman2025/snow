@@ -3,14 +3,14 @@
   --snow-pile-height: 0px;
   --snow-pile-max-vh: 5;
   --snow-fill: 0;
-  /* 1 = W3Bits default; >1 slows fall duration only. 2 = 50% slower. */
-  --snow-fall-speed: 2;
+  /* 1 = W3Bits default; >1 multiplies fall duration. 5 ≈ 80% slower (5× duration). */
+  --snow-fall-speed: 5;
   --snow-sway-px: 26px;
 }
 
 @media (max-width: 768px) {
   :root {
-    --snow-fall-speed: 2;
+    --snow-fall-speed: 5;
     --snow-sway-px: 14px;
   }
 }

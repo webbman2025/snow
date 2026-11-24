@@ -120,7 +120,7 @@ Everything else (GTM, `#root`, `static/js/main.js`, APIs) should match your **cu
 
 In `home-snow-accumulate.css`, `:root` includes:
 
-- `--snow-fall-speed` — `2` = 50% slower fall (current UAT value)
+- `--snow-fall-speed` — `5` ≈ 80% slower fall (5× W3Bits duration; current UAT value)
 - `--snow-pile-max-vh` — max pile height (default `5` = 5vh)
 
 Bump `?v=` on CSS/JS links after deploy when caches are sticky.
