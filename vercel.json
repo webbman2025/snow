@@ -4,6 +4,7 @@
     { "source": "/", "destination": "/christmas/home.html" },
     { "source": "/home.html", "destination": "/christmas/home.html" },
     { "source": "/home2.html", "destination": "/christmas/home2.html" },
+    { "source": "/home3.html", "destination": "/christmas/home3.html" },
     { "source": "/christmas", "destination": "/christmas/index.html" },
     { "source": "/christmas/", "destination": "/christmas/index.html" },
     { "source": "/christmas/home", "destination": "/christmas/index.html" },
