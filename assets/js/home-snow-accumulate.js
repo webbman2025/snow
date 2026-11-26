@@ -292,6 +292,7 @@
     var px = isMobile()
       ? Math.max(72, viewportW() * 0.2)
       : Math.max(42, viewportW() * 0.07);
+    px *= 0.95;
     var perBin = viewportW() / BIN_COUNT;
     if (!(perBin > 0)) {
       return 3;
