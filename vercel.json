@@ -8,7 +8,15 @@
     { "source": "/christmas", "destination": "/christmas/index.html" },
     { "source": "/christmas/", "destination": "/christmas/index.html" },
     { "source": "/christmas/home", "destination": "/christmas/index.html" },
-    { "source": "/christmas/home.html", "destination": "/christmas/index.html" }
+    { "source": "/christmas/home.html", "destination": "/christmas/index.html" },
+    {
+      "source": "/media/:path*",
+      "destination": "https://www.three.com.hk/media/:path*"
+    },
+    {
+      "source": "/assets/images/:path*",
+      "destination": "https://www.three.com.hk/assets/images/:path*"
+    }
   ],
   "headers": [
     {
