@@ -187,6 +187,9 @@ html.home3-inpage #night-sky-inpage .night-shine-star--6 {
 
 /* --- Section titles on night: black type + white outer glow (mobile + desktop) --- */
 html.home3-inpage {
+  /* ~20% of viewport snow at bottom on first paint (demo feedback) */
+  --snow-pile-start-vh: 20;
+  --snow-pile-max-vh: 22;
   --home3-title-glow:
     0 0 1px rgba(255, 255, 255, 1),
     0 0 3px rgba(255, 255, 255, 0.98),

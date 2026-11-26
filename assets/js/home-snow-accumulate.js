@@ -66,6 +66,39 @@
     return viewportH() * (pct / 100);
   }
 
+  function startPilePx() {
+    var pct = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue("--snow-pile-start-vh")
+    );
+    if (!(pct > 0)) {
+      return 0;
+    }
+    var h = viewportH() * (pct / 100);
+    var cap = maxPilePx();
+    if (cap > 0 && h > cap) {
+      h = cap;
+    }
+    return h;
+  }
+
+  /** Pre-fill bottom snow so first-time visitors see an obvious pile (home3: --snow-pile-start-vh). */
+  function seedInitialPile() {
+    var depth = startPilePx();
+    if (!(depth > 0)) {
+      return;
+    }
+    var denom = BIN_COUNT > 1 ? BIN_COUNT - 1 : 1;
+    for (i = 0; i < BIN_COUNT; i++) {
+      var t = i / denom;
+      var wave =
+        0.9 +
+        0.08 * Math.sin(t * Math.PI * 2.4) +
+        0.04 * Math.sin(t * Math.PI * 5.7 + 0.6);
+      bins[i] = depth * wave;
+    }
+    full = pileAtMaxDepth();
+  }
+
   function pileAtMaxDepth() {
     return maxBinHeight() >= maxPilePx() * 0.96;
   }
@@ -459,11 +492,13 @@
 
   function bindFlakes() {
     initBins();
+    seedInitialPile();
     syncFlakeVisibility();
     applyFlakeMotion();
     flakes.forEach(function (el) {
       el._snowAboveSurface = true;
     });
+    disarmFlakesAlreadyDown();
     updatePile(true);
     if (!rafId && !document.hidden) {
       rafId = requestAnimationFrame(tick);
