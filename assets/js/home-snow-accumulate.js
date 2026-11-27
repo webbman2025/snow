@@ -120,24 +120,23 @@
     return s > 0 && !isNaN(s) ? s : fallback;
   }
 
-  /** Extra height on reference profile (1 = none); fades before the right crest. */
+  /** Scales reference height per zone (1 = none); blend ends before the right crest. */
   function referenceRegionLift(t) {
     var leftLift = regionLiftMultiplier("--snow-pile-left-lift", 1);
     var midLift = regionLiftMultiplier("--snow-pile-mid-lift", 1);
     if (leftLift <= 1.001 && midLift <= 1.001) {
       return 1;
     }
-    var lift = 1;
     if (t < 0.36) {
-      var fade = 1 - t / 0.36;
-      fade = fade * fade;
-      lift = 1 + (leftLift - 1) * fade;
-    } else if (t < 0.62) {
-      lift = midLift;
-    } else if (t < 0.78) {
-      lift = midLift + (1 - midLift) * ((t - 0.62) / 0.16);
+      return leftLift;
     }
-    return lift;
+    if (t < 0.62) {
+      return midLift;
+    }
+    if (t < 0.68) {
+      return midLift + (1 - midLift) * ((t - 0.62) / 0.06);
+    }
+    return 1;
   }
 
   /**
