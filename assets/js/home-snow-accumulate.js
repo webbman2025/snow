@@ -81,19 +81,50 @@
     return h;
   }
 
+  function pileBumpScale() {
+    var s = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue("--snow-pile-bump-scale")
+    );
+    return s > 0 && !isNaN(s) ? s : 1;
+  }
+
+  function pileSurfaceWave(t) {
+    return (
+      1 +
+      0.12 * Math.sin(t * Math.PI * 3.8) +
+      0.07 * Math.sin(t * Math.PI * 8.1 + 0.9) +
+      0.05 * Math.sin(t * Math.PI * 14.2 + 2.1)
+    );
+  }
+
+  function pileSmoothRadius() {
+    var r = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue("--snow-pile-smooth-radius")
+    );
+    if (!isNaN(r) && r >= 0) {
+      return Math.round(r);
+    }
+    return isMobile() ? 2 : 3;
+  }
+
   /** Pre-fill bottom snow so first-time visitors see an obvious pile (home3: --snow-pile-start-vh). */
   function seedInitialPile() {
     var depth = startPilePx();
     if (!(depth > 0)) {
       return;
     }
+    var bump = pileBumpScale();
     var denom = BIN_COUNT > 1 ? BIN_COUNT - 1 : 1;
     for (i = 0; i < BIN_COUNT; i++) {
       var t = i / denom;
-      var wave =
-        0.9 +
-        0.08 * Math.sin(t * Math.PI * 2.4) +
-        0.04 * Math.sin(t * Math.PI * 5.7 + 0.6);
+      var wave = pileSurfaceWave(t);
+      wave = 1 + (wave - 1) * bump;
+      if (wave < 0.52) {
+        wave = 0.52;
+      }
+      if (wave > 1.08) {
+        wave = 1.08;
+      }
       bins[i] = depth * wave;
     }
     full = pileAtMaxDepth();
@@ -171,7 +202,7 @@
 
   function smoothedBins() {
     var out = new Array(BIN_COUNT);
-    var radius = isMobile() ? 2 : 3;
+    var radius = pileSmoothRadius();
     for (i = 0; i < BIN_COUNT; i++) {
       if (bins[i] <= 0.4) {
         out[i] = 0;

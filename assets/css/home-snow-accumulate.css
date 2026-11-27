@@ -4,6 +4,10 @@
   --snow-pile-max-vh: 5;
   /* Initial visible pile on load (vh); 0 = empty until flakes land */
   --snow-pile-start-vh: 0;
+  /* Clip-path smoothing (bins); lower = bumpier surface. Unset = 3 desktop / 2 mobile */
+  --snow-pile-smooth-radius: ;
+  /* Amplifies seeded wavy top (1 = default). home3 uses ~1.35 */
+  --snow-pile-bump-scale: 1;
   --snow-fill: 0;
   /* 1 = W3Bits default; >1 multiplies fall duration. 5 ≈ 80% slower (5× duration). */
   --snow-fall-speed: 5;
