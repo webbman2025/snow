@@ -93,9 +93,11 @@
   function pileSurfaceWave(t) {
     return (
       1 +
-      0.12 * Math.sin(t * Math.PI * 3.8) +
-      0.07 * Math.sin(t * Math.PI * 8.1 + 0.9) +
-      0.05 * Math.sin(t * Math.PI * 14.2 + 2.1)
+      0.1 * Math.sin(t * Math.PI * 1.5) +
+      0.07 * Math.sin(t * Math.PI * 2.9 + 0.4) +
+      0.09 * Math.sin(t * Math.PI * 3.8) +
+      0.05 * Math.sin(t * Math.PI * 8.1 + 0.9) +
+      0.03 * Math.sin(t * Math.PI * 14.2 + 2.1)
     );
   }
 
@@ -156,6 +158,46 @@
       return Math.round(r);
     }
     return isMobile() ? 2 : 3;
+  }
+
+  /** Extra box-blur on clip-path contour only (smoother arcs, less straight segments). */
+  function pileCurveSmoothRadius() {
+    var r = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue("--snow-pile-curve-smooth")
+    );
+    if (!isNaN(r) && r >= 0) {
+      return Math.round(r);
+    }
+    return 0;
+  }
+
+  function boxBlurBins(src, radius) {
+    if (!(radius > 0)) {
+      return src;
+    }
+    var out = new Array(src.length);
+    var j;
+    for (i = 0; i < src.length; i++) {
+      var sum = 0;
+      var n = 0;
+      for (j = i - radius; j <= i + radius; j++) {
+        if (j >= 0 && j < src.length) {
+          sum += src[j];
+          n++;
+        }
+      }
+      out[i] = n > 0 ? sum / n : src[i];
+    }
+    return out;
+  }
+
+  function contourForClip() {
+    var smooth = smoothedBins();
+    var curveR = pileCurveSmoothRadius();
+    if (curveR > 0) {
+      smooth = boxBlurBins(smooth, curveR);
+    }
+    return smooth;
   }
 
   function reliefEnvelopeActive() {
@@ -375,7 +417,7 @@
       return;
     }
     if (forceClip || !clipPathCache) {
-      clipPathCache = pileClipPath(smoothedBins(), maxH);
+      clipPathCache = pileClipPath(contourForClip(), maxH);
       pile.style.clipPath = clipPathCache;
     }
   }

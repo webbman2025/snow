@@ -16,6 +16,8 @@
   --snow-pile-left-relief: 0;
   /* Extra right-edge relief (0 = off) */
   --snow-pile-right-relief: 0;
+  /* Clip-path contour blur (0 = off); softer curved snow top */
+  --snow-pile-curve-smooth: 0;
   --snow-fill: 0;
   /* 1 = W3Bits default; >1 multiplies fall duration. 5 ≈ 80% slower (5× duration). */
   --snow-fall-speed: 5;
