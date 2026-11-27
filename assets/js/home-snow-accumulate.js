@@ -16,6 +16,7 @@
   var MOBILE_FLAKE_LIMIT = 36;
   var BIN_COUNT = 96;
   var bins = [];
+  var reliefEnvelope = [];
   var full = false;
   var flakes = [];
   var rafId = 0;
@@ -43,6 +44,7 @@
     }
     full = false;
     clipPathCache = "";
+    buildReliefEnvelope();
   }
 
   function viewportW() {
@@ -107,38 +109,95 @@
     return isMobile() ? 2 : 3;
   }
 
+  function reliefEnvelopeActive() {
+    var v = getComputedStyle(document.documentElement)
+      .getPropertyValue("--snow-pile-relief-envelope")
+      .trim();
+    return v === "1" || v === "true";
+  }
+
+  function pileSpreadFactor() {
+    var s = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue("--snow-pile-spread")
+    );
+    if (!isNaN(s) && s >= 0 && s <= 1) {
+      return s;
+    }
+    return 0.22;
+  }
+
+  function waveFactorAtBin(index) {
+    if (reliefEnvelope.length === BIN_COUNT && reliefEnvelope[index] > 0) {
+      return reliefEnvelope[index];
+    }
+    var denom = BIN_COUNT > 1 ? BIN_COUNT - 1 : 1;
+    var t = index / denom;
+    var bump = pileBumpScale();
+    var wave = pileSurfaceWave(t);
+    wave = 1 + (wave - 1) * bump;
+    if (wave < 0.52) {
+      wave = 0.52;
+    }
+    if (wave > 1.08) {
+      wave = 1.08;
+    }
+    return wave;
+  }
+
+  function buildReliefEnvelope() {
+    reliefEnvelope = new Array(BIN_COUNT);
+    for (i = 0; i < BIN_COUNT; i++) {
+      reliefEnvelope[i] = waveFactorAtBin(i);
+    }
+  }
+
+  function binCapPx(b) {
+    var cap = maxPilePx();
+    if (!reliefEnvelopeActive()) {
+      return cap;
+    }
+    return cap * waveFactorAtBin(b);
+  }
+
   /** Pre-fill bottom snow so first-time visitors see an obvious pile (home3: --snow-pile-start-vh). */
   function seedInitialPile() {
     var depth = startPilePx();
     if (!(depth > 0)) {
       return;
     }
-    var bump = pileBumpScale();
-    var denom = BIN_COUNT > 1 ? BIN_COUNT - 1 : 1;
     for (i = 0; i < BIN_COUNT; i++) {
-      var t = i / denom;
-      var wave = pileSurfaceWave(t);
-      wave = 1 + (wave - 1) * bump;
-      if (wave < 0.52) {
-        wave = 0.52;
-      }
-      if (wave > 1.08) {
-        wave = 1.08;
-      }
-      bins[i] = depth * wave;
+      bins[i] = depth * waveFactorAtBin(i);
     }
     full = pileAtMaxDepth();
   }
 
   function pileAtMaxDepth() {
-    return maxBinHeight() >= maxPilePx() * 0.96;
+    var cap = maxPilePx();
+    if (!(cap > 0)) {
+      return false;
+    }
+    if (!reliefEnvelopeActive()) {
+      return maxBinHeight() >= cap * 0.96;
+    }
+    var peak = 0;
+    for (i = 0; i < BIN_COUNT; i++) {
+      var localCap = binCapPx(i);
+      if (!(localCap > 0)) {
+        continue;
+      }
+      var ratio = bins[i] / localCap;
+      if (ratio > peak) {
+        peak = ratio;
+      }
+    }
+    return peak >= 0.96;
   }
 
   function clampBins() {
-    var cap = maxPilePx();
     for (i = 0; i < BIN_COUNT; i++) {
-      if (bins[i] > cap) {
-        bins[i] = cap;
+      var localCap = binCapPx(i);
+      if (bins[i] > localCap) {
+        bins[i] = localCap;
       }
     }
     full = pileAtMaxDepth();
@@ -185,8 +244,7 @@
     if (b < 0 || b >= BIN_COUNT) {
       return;
     }
-    var cap = maxPilePx();
-    var room = cap - bins[b];
+    var room = binCapPx(b) - bins[b];
     if (room <= 0) {
       return;
     }
@@ -194,9 +252,12 @@
   }
 
   function spreadDeposit(bin, amount) {
+    var spread = pileSpreadFactor();
     addDepositToBin(bin, amount);
-    addDepositToBin(bin - 1, amount * 0.22);
-    addDepositToBin(bin + 1, amount * 0.22);
+    if (spread > 0) {
+      addDepositToBin(bin - 1, amount * spread);
+      addDepositToBin(bin + 1, amount * spread);
+    }
     full = pileAtMaxDepth();
   }
 
@@ -446,11 +507,12 @@
     if (brushCoversBin(bin)) {
       return;
     }
-    var cap = maxPilePx();
-    if (bins[bin] >= cap - 0.25) {
+    if (bins[bin] >= binCapPx(bin) - 0.25) {
       return;
     }
-    spreadDeposit(bin, flakeDepositPx(el, rect));
+    var amount = flakeDepositPx(el, rect);
+    amount *= 0.82 + 0.28 * Math.abs(Math.sin(bin * 12.9898 + rect.left * 0.013));
+    spreadDeposit(bin, amount);
     clipPathCache = "";
     updatePile(true);
   }

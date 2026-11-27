@@ -190,8 +190,10 @@ html.home3-inpage {
   /* Pre-fill to standard max (5vh) so snow is visible without overshooting */
   --snow-pile-start-vh: 5;
   --snow-pile-max-vh: 5;
-  --snow-pile-smooth-radius: 1;
-  --snow-pile-bump-scale: 1.35;
+  --snow-pile-smooth-radius: 0;
+  --snow-pile-bump-scale: 1.45;
+  --snow-pile-relief-envelope: 1;
+  --snow-pile-spread: 0.06;
   --home3-title-glow:
     0 0 1px rgba(255, 255, 255, 1),
     0 0 3px rgba(255, 255, 255, 0.98),
