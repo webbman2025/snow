@@ -40,7 +40,7 @@
     var fine =
       document.documentElement.classList.contains("home3-inpage") &&
       reliefEnvelopeActive();
-    BIN_COUNT = isMobile() ? 40 : fine ? 112 : 96;
+    BIN_COUNT = isMobile() ? 48 : fine ? (profileUsesReferenceShape() ? 128 : 112) : 96;
     bins = new Array(BIN_COUNT);
     for (i = 0; i < BIN_COUNT; i++) {
       bins[i] = 0;
@@ -99,6 +99,39 @@
       getComputedStyle(document.documentElement).getPropertyValue("--snow-pile-slope-depth")
     );
     return s > 0 && !isNaN(s) ? s : 1;
+  }
+
+  function pileProfileMode() {
+    return getComputedStyle(document.documentElement).getPropertyValue("--snow-pile-profile").trim().toLowerCase();
+  }
+
+  function profileUsesReferenceShape() {
+    var mode = pileProfileMode();
+    return mode === "reference" || mode === "bump" || mode === "drift";
+  }
+
+  function gaussBump(t, center, sigma, amplitude) {
+    var d = (t - center) / sigma;
+    return amplitude * Math.exp(-(d * d));
+  }
+
+  /**
+   * Art-directed snow lip: twin bumps left, wide mid dip, tall right double-bump (design reference).
+   */
+  function referenceBumpProfile(t) {
+    var base = 0.56 + 0.18 * t;
+    var profile =
+      base +
+      gaussBump(t, 0.055, 0.038, 0.13) +
+      gaussBump(t, 0.155, 0.048, 0.19) +
+      gaussBump(t, 0.27, 0.06, -0.07) +
+      gaussBump(t, 0.46, 0.13, -0.14) +
+      gaussBump(t, 0.58, 0.09, 0.06) +
+      gaussBump(t, 0.71, 0.042, 0.2) +
+      gaussBump(t, 0.835, 0.072, 0.34) +
+      gaussBump(t, 0.94, 0.032, 0.05);
+    profile += 0.012 * Math.sin(t * Math.PI * 16 + 0.85);
+    return profile;
   }
 
   function pileSurfaceWave(t) {
@@ -305,6 +338,17 @@
     var denom = BIN_COUNT > 1 ? BIN_COUNT - 1 : 1;
     var t = index / denom;
     var bump = pileBumpScale();
+    if (profileUsesReferenceShape()) {
+      var shaped = referenceBumpProfile(t);
+      var refWave = 1 + (shaped - 1) * bump;
+      if (refWave < 0.38) {
+        refWave = 0.38;
+      }
+      if (refWave > 1.44) {
+        refWave = 1.44;
+      }
+      return refWave;
+    }
     var left = pileLeftReliefScale();
     var right = pileRightReliefScale();
     var mid = pileMidReliefScale();

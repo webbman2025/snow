@@ -190,16 +190,17 @@ html.home3-inpage {
   /* Pre-fill to standard max (5vh) so snow is visible without overshooting */
   --snow-pile-start-vh: 5;
   --snow-pile-max-vh: 5;
-  --snow-pile-smooth-radius: 2;
-  --snow-pile-curve-smooth: 4;
-  --snow-pile-bump-scale: 1.72;
-  --snow-pile-slope-depth: 1.78;
+  --snow-pile-profile: reference;
+  --snow-pile-smooth-radius: 1;
+  --snow-pile-curve-smooth: 2;
+  --snow-pile-bump-scale: 1.12;
+  --snow-pile-slope-depth: 1;
   --snow-pile-relief-envelope: 1;
-  --snow-pile-spread: 0.05;
-  --snow-pile-left-relief: 2.35;
-  --snow-pile-mid-relief: 2.15;
-  --snow-pile-right-relief: 2.25;
-  --snow-pile-quarter-relief: 1.45;
+  --snow-pile-spread: 0.04;
+  --snow-pile-left-relief: 0;
+  --snow-pile-mid-relief: 0;
+  --snow-pile-right-relief: 0;
+  --snow-pile-quarter-relief: 0;
   --home3-title-glow:
     0 0 1px rgba(255, 255, 255, 1),
     0 0 3px rgba(255, 255, 255, 0.98),
