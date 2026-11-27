@@ -108,16 +108,17 @@
 
   /** Extra bumps on the left edge (t = 0 … ~0.45); fades toward centre. */
   function leftSideWave(t) {
-    if (t >= 0.48) {
+    if (t >= 0.54) {
       return 0;
     }
-    var fade = 1 - t / 0.48;
+    var fade = 1 - t / 0.54;
     fade *= fade;
     return (
       fade *
-      (0.17 * Math.sin(t * Math.PI * 11 + 0.25) +
-        0.12 * Math.sin(t * Math.PI * 21 + 1.7) +
-        0.09 * Math.cos(t * Math.PI * 7.2 + 0.5))
+      (0.21 * Math.sin(t * Math.PI * 11 + 0.25) +
+        0.15 * Math.sin(t * Math.PI * 21 + 1.7) +
+        0.12 * Math.cos(t * Math.PI * 7.2 + 0.5) +
+        0.08 * Math.sin(t * Math.PI * 28 + 2.3))
     );
   }
 
