@@ -125,10 +125,10 @@
       gaussBump(t, 0.055, 0.038, 0.13) +
       gaussBump(t, 0.155, 0.048, 0.19) +
       gaussBump(t, 0.27, 0.06, -0.07) +
-      gaussBump(t, 0.46, 0.13, -0.14) +
-      gaussBump(t, 0.58, 0.09, 0.06) +
-      gaussBump(t, 0.71, 0.042, 0.2) +
-      gaussBump(t, 0.835, 0.072, 0.34) +
+      gaussBump(t, 0.46, 0.14, -0.17) +
+      gaussBump(t, 0.58, 0.09, 0.07) +
+      gaussBump(t, 0.71, 0.044, 0.23) +
+      gaussBump(t, 0.835, 0.074, 0.38) +
       gaussBump(t, 0.94, 0.032, 0.05);
     profile += 0.012 * Math.sin(t * Math.PI * 16 + 0.85);
     return profile;
