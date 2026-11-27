@@ -20,6 +20,9 @@
   --snow-pile-mid-relief: 0;
   /* Envelope shape: procedural (default), reference, bump, or drift */
   --snow-pile-profile: procedural;
+  /* Reference profile: multiply left / mid height (1 = default) */
+  --snow-pile-left-lift: 1;
+  --snow-pile-mid-lift: 1;
   /* Extra depth on left / mid / right slopes (1 = default) */
   --snow-pile-slope-depth: 1;
   /* Left-mid / right-mid slope bands (0 = off) */

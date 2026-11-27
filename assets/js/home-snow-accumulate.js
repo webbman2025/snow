@@ -115,6 +115,31 @@
     return amplitude * Math.exp(-(d * d));
   }
 
+  function regionLiftMultiplier(cssVar, fallback) {
+    var s = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(cssVar));
+    return s > 0 && !isNaN(s) ? s : fallback;
+  }
+
+  /** Extra height on reference profile (1 = none); fades before the right crest. */
+  function referenceRegionLift(t) {
+    var leftLift = regionLiftMultiplier("--snow-pile-left-lift", 1);
+    var midLift = regionLiftMultiplier("--snow-pile-mid-lift", 1);
+    if (leftLift <= 1.001 && midLift <= 1.001) {
+      return 1;
+    }
+    var lift = 1;
+    if (t < 0.36) {
+      var fade = 1 - t / 0.36;
+      fade = fade * fade;
+      lift = 1 + (leftLift - 1) * fade;
+    } else if (t < 0.62) {
+      lift = midLift;
+    } else if (t < 0.78) {
+      lift = midLift + (1 - midLift) * ((t - 0.62) / 0.16);
+    }
+    return lift;
+  }
+
   /**
    * Art-directed snow lip: twin bumps left, wide mid dip, tall right double-bump (design reference).
    */
@@ -341,11 +366,13 @@
     if (profileUsesReferenceShape()) {
       var shaped = referenceBumpProfile(t);
       var refWave = 1 + (shaped - 1) * bump;
+      var regionLift = referenceRegionLift(t);
+      refWave = 1 + (refWave - 1) * regionLift;
       if (refWave < 0.38) {
         refWave = 0.38;
       }
-      if (refWave > 1.44) {
-        refWave = 1.44;
+      if (refWave > 1.48) {
+        refWave = 1.48;
       }
       return refWave;
     }

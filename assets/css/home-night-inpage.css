@@ -191,6 +191,8 @@ html.home3-inpage {
   --snow-pile-start-vh: 5.25;
   --snow-pile-max-vh: 5.25;
   --snow-pile-profile: reference;
+  --snow-pile-left-lift: 1.1;
+  --snow-pile-mid-lift: 1.1;
   --snow-pile-smooth-radius: 1;
   --snow-pile-curve-smooth: 2;
   --snow-pile-bump-scale: 1.22;
