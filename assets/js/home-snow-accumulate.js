@@ -121,6 +121,32 @@
     );
   }
 
+  function pileRightReliefScale() {
+    var s = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue("--snow-pile-right-relief")
+    );
+    return s > 0 && !isNaN(s) ? s : 0;
+  }
+
+  /** Extra bumps on the right edge; fades toward centre. */
+  function rightSideWave(t) {
+    if (t <= 0.52) {
+      return 0;
+    }
+    var fromRight = 1 - t;
+    if (fromRight >= 0.48) {
+      return 0;
+    }
+    var fade = 1 - fromRight / 0.48;
+    fade *= fade;
+    return (
+      fade *
+      (0.16 * Math.sin(fromRight * Math.PI * 12 + 1.05) +
+        0.13 * Math.sin(fromRight * Math.PI * 19 + 0.35) +
+        0.1 * Math.cos(fromRight * Math.PI * 8.3 + 1.15))
+    );
+  }
+
   function pileSmoothRadius() {
     var r = parseFloat(
       getComputedStyle(document.documentElement).getPropertyValue("--snow-pile-smooth-radius")
@@ -156,7 +182,9 @@
     var t = index / denom;
     var bump = pileBumpScale();
     var left = pileLeftReliefScale();
-    var wave = pileSurfaceWave(t) + left * leftSideWave(t);
+    var right = pileRightReliefScale();
+    var wave =
+      pileSurfaceWave(t) + left * leftSideWave(t) + right * rightSideWave(t);
     wave = 1 + (wave - 1) * bump;
     if (wave < 0.5) {
       wave = 0.5;
