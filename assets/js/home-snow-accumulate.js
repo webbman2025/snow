@@ -37,7 +37,10 @@
   }
 
   function initBins() {
-    BIN_COUNT = isMobile() ? 40 : 96;
+    var fine =
+      document.documentElement.classList.contains("home3-inpage") &&
+      reliefEnvelopeActive();
+    BIN_COUNT = isMobile() ? 40 : fine ? 112 : 96;
     bins = new Array(BIN_COUNT);
     for (i = 0; i < BIN_COUNT; i++) {
       bins[i] = 0;
@@ -90,11 +93,22 @@
     return s > 0 && !isNaN(s) ? s : 1;
   }
 
+  /** Multiplier for left / mid / right slope terms only (home3). */
+  function pileSlopeDepth() {
+    var s = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue("--snow-pile-slope-depth")
+    );
+    return s > 0 && !isNaN(s) ? s : 1;
+  }
+
   function pileSurfaceWave(t) {
     return (
       1 +
+      0.12 * (0.5 - t) +
+      0.1 * Math.sin(t * Math.PI * 0.82 + 0.15) +
+      0.11 * Math.sin(t * Math.PI * 1.15 + 0.2) +
       0.1 * Math.sin(t * Math.PI * 1.5) +
-      0.07 * Math.sin(t * Math.PI * 2.9 + 0.4) +
+      0.08 * Math.sin(t * Math.PI * 2.9 + 0.4) +
       0.09 * Math.sin(t * Math.PI * 3.8) +
       0.05 * Math.sin(t * Math.PI * 8.1 + 0.9) +
       0.03 * Math.sin(t * Math.PI * 14.2 + 2.1)
@@ -117,7 +131,9 @@
     fade *= fade;
     return (
       fade *
-      (0.21 * Math.sin(t * Math.PI * 11 + 0.25) +
+      (0.26 * Math.sin(t * Math.PI * 2.4 + 0.35) +
+        0.2 * Math.sin(t * Math.PI * 4.2 + 1.05) +
+        0.21 * Math.sin(t * Math.PI * 11 + 0.25) +
         0.15 * Math.sin(t * Math.PI * 21 + 1.7) +
         0.12 * Math.cos(t * Math.PI * 7.2 + 0.5) +
         0.08 * Math.sin(t * Math.PI * 28 + 2.3))
@@ -129,6 +145,69 @@
       getComputedStyle(document.documentElement).getPropertyValue("--snow-pile-right-relief")
     );
     return s > 0 && !isNaN(s) ? s : 0;
+  }
+
+  function pileMidReliefScale() {
+    var s = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue("--snow-pile-mid-relief")
+    );
+    return s > 0 && !isNaN(s) ? s : 0;
+  }
+
+  function pileQuarterReliefScale() {
+    var s = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue("--snow-pile-quarter-relief")
+    );
+    return s > 0 && !isNaN(s) ? s : 0;
+  }
+
+  /** Left-mid slope (between edge and centre). */
+  function leftQuarterWave(t) {
+    var d = Math.abs(t - 0.26);
+    if (d >= 0.22) {
+      return 0;
+    }
+    var fade = 1 - d / 0.22;
+    fade *= fade;
+    return (
+      fade *
+      (0.22 * Math.sin(t * Math.PI * 3.4 + 0.45) +
+        0.18 * Math.cos(t * Math.PI * 1.6 + 0.35) +
+        0.14 * Math.sin(t * Math.PI * 5.1 + 1.2))
+    );
+  }
+
+  /** Right-mid slope (between centre and edge). */
+  function rightQuarterWave(t) {
+    var d = Math.abs(t - 0.74);
+    if (d >= 0.22) {
+      return 0;
+    }
+    var fade = 1 - d / 0.22;
+    fade *= fade;
+    return (
+      fade *
+      (0.22 * Math.sin((1 - t) * Math.PI * 3.3 + 0.55) +
+        0.18 * Math.cos((1 - t) * Math.PI * 1.7 + 0.4) +
+        0.14 * Math.sin((1 - t) * Math.PI * 5.0 + 0.95))
+    );
+  }
+
+  /** Centre-band slopes; fades toward left/right edges (broader than edge ripples). */
+  function midSectionWave(t) {
+    var d = Math.abs(t - 0.5);
+    if (d >= 0.4) {
+      return 0;
+    }
+    var fade = 1 - d / 0.4;
+    fade *= fade;
+    return (
+      fade *
+      (0.32 * Math.sin(t * Math.PI * 2.6 + 0.5) +
+        0.26 * Math.sin(t * Math.PI * 4.8 + 1.15) +
+        0.2 * Math.cos(t * Math.PI * 6.5 + 0.85) +
+        0.16 * Math.sin(t * Math.PI * 1.9 + 0.25))
+    );
   }
 
   /** Extra bumps on the right edge; fades toward centre. */
@@ -144,7 +223,9 @@
     fade *= fade;
     return (
       fade *
-      (0.16 * Math.sin(fromRight * Math.PI * 12 + 1.05) +
+      (0.25 * Math.sin(fromRight * Math.PI * 2.5 + 0.9) +
+        0.2 * Math.sin(fromRight * Math.PI * 4.4 + 0.45) +
+        0.16 * Math.sin(fromRight * Math.PI * 12 + 1.05) +
         0.13 * Math.sin(fromRight * Math.PI * 19 + 0.35) +
         0.1 * Math.cos(fromRight * Math.PI * 8.3 + 1.15))
     );
@@ -226,14 +307,22 @@
     var bump = pileBumpScale();
     var left = pileLeftReliefScale();
     var right = pileRightReliefScale();
-    var wave =
-      pileSurfaceWave(t) + left * leftSideWave(t) + right * rightSideWave(t);
+    var mid = pileMidReliefScale();
+    var quarter = pileQuarterReliefScale();
+    var depth = pileSlopeDepth();
+    var regional =
+      depth *
+      (left * leftSideWave(t) +
+        right * rightSideWave(t) +
+        mid * midSectionWave(t) +
+        quarter * (leftQuarterWave(t) + rightQuarterWave(t)));
+    var wave = pileSurfaceWave(t) + regional;
     wave = 1 + (wave - 1) * bump;
-    if (wave < 0.5) {
-      wave = 0.5;
+    if (wave < 0.34) {
+      wave = 0.34;
     }
-    if (wave > 1.12) {
-      wave = 1.12;
+    if (wave > 1.38) {
+      wave = 1.38;
     }
     return wave;
   }
