@@ -356,8 +356,12 @@
     return 0.22;
   }
 
-  function waveFactorAtBin(index) {
-    if (reliefEnvelope.length === BIN_COUNT && reliefEnvelope[index] > 0) {
+  function waveFactorAtBin(index, skipEnvelopeCache) {
+    if (
+      !skipEnvelopeCache &&
+      reliefEnvelope.length === BIN_COUNT &&
+      reliefEnvelope[index] > 0
+    ) {
       return reliefEnvelope[index];
     }
     var denom = BIN_COUNT > 1 ? BIN_COUNT - 1 : 1;
@@ -367,7 +371,9 @@
       var shaped = referenceBumpProfile(t);
       var refWave = 1 + (shaped - 1) * bump;
       var regionLift = referenceRegionLift(t);
-      refWave = 1 + (refWave - 1) * regionLift;
+      if (regionLift > 1.001) {
+        refWave *= regionLift;
+      }
       if (refWave < 0.38) {
         refWave = 0.38;
       }
@@ -401,8 +407,21 @@
   function buildReliefEnvelope() {
     reliefEnvelope = new Array(BIN_COUNT);
     for (i = 0; i < BIN_COUNT; i++) {
-      reliefEnvelope[i] = waveFactorAtBin(i);
+      reliefEnvelope[i] = waveFactorAtBin(i, true);
     }
+  }
+
+  /** Re-apply start-vh prefill when viewport or envelope changes (keeps 5.25vh in sync). */
+  function syncSeededPileToCaps() {
+    var depth = startPilePx();
+    if (!(depth > 0)) {
+      return;
+    }
+    buildReliefEnvelope();
+    for (i = 0; i < BIN_COUNT; i++) {
+      bins[i] = depth * waveFactorAtBin(i, true);
+    }
+    full = pileAtMaxDepth();
   }
 
   function binCapPx(b) {
@@ -415,14 +434,7 @@
 
   /** Pre-fill bottom snow so first-time visitors see an obvious pile (home3: --snow-pile-start-vh). */
   function seedInitialPile() {
-    var depth = startPilePx();
-    if (!(depth > 0)) {
-      return;
-    }
-    for (i = 0; i < BIN_COUNT; i++) {
-      bins[i] = depth * waveFactorAtBin(i);
-    }
-    full = pileAtMaxDepth();
+    syncSeededPileToCaps();
   }
 
   function pileAtMaxDepth() {
@@ -918,6 +930,10 @@
       initBins();
       syncFlakeVisibility();
       applyFlakeMotion();
+    } else if (startPilePx() > 0) {
+      syncSeededPileToCaps();
+    } else {
+      buildReliefEnvelope();
     }
     clipPathCache = "";
     updatePile(true);
