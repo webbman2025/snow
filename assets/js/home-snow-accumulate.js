@@ -37,7 +37,10 @@
   }
 
   function initBins() {
-    BIN_COUNT = isMobile() ? 40 : 96;
+    var fine =
+      document.documentElement.classList.contains("home3-inpage") &&
+      reliefEnvelopeActive();
+    BIN_COUNT = isMobile() ? 40 : fine ? 120 : 96;
     bins = new Array(BIN_COUNT);
     for (i = 0; i < BIN_COUNT; i++) {
       bins[i] = 0;
@@ -93,9 +96,10 @@
   function pileSurfaceWave(t) {
     return (
       1 +
-      0.12 * Math.sin(t * Math.PI * 3.8) +
-      0.07 * Math.sin(t * Math.PI * 8.1 + 0.9) +
-      0.05 * Math.sin(t * Math.PI * 14.2 + 2.1)
+      0.15 * Math.sin(t * Math.PI * 3.8) +
+      0.1 * Math.sin(t * Math.PI * 8.1 + 0.9) +
+      0.08 * Math.sin(t * Math.PI * 14.2 + 2.1) +
+      0.05 * Math.sin(t * Math.PI * 22 + 1.4)
     );
   }
 
@@ -127,6 +131,30 @@
       getComputedStyle(document.documentElement).getPropertyValue("--snow-pile-right-relief")
     );
     return s > 0 && !isNaN(s) ? s : 0;
+  }
+
+  function pileMidReliefScale() {
+    var s = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue("--snow-pile-mid-relief")
+    );
+    return s > 0 && !isNaN(s) ? s : 0;
+  }
+
+  /** Mid-band bumps (flat zones under hero); fades toward left/right. */
+  function midSectionWave(t) {
+    var d = Math.abs(t - 0.5);
+    if (d >= 0.4) {
+      return 0;
+    }
+    var fade = 1 - d / 0.4;
+    fade *= fade;
+    return (
+      fade *
+      (0.16 * Math.sin(t * Math.PI * 17 + 0.65) +
+        0.12 * Math.sin(t * Math.PI * 26 + 2.0) +
+        0.09 * Math.cos(t * Math.PI * 33 + 1.05) +
+        0.07 * Math.sin(t * Math.PI * 9 + 0.2))
+    );
   }
 
   /** Extra bumps on the right edge; fades toward centre. */
@@ -184,14 +212,18 @@
     var bump = pileBumpScale();
     var left = pileLeftReliefScale();
     var right = pileRightReliefScale();
+    var mid = pileMidReliefScale();
     var wave =
-      pileSurfaceWave(t) + left * leftSideWave(t) + right * rightSideWave(t);
+      pileSurfaceWave(t) +
+      left * leftSideWave(t) +
+      right * rightSideWave(t) +
+      mid * midSectionWave(t);
     wave = 1 + (wave - 1) * bump;
-    if (wave < 0.5) {
-      wave = 0.5;
+    if (wave < 0.48) {
+      wave = 0.48;
     }
-    if (wave > 1.12) {
-      wave = 1.12;
+    if (wave > 1.15) {
+      wave = 1.15;
     }
     return wave;
   }

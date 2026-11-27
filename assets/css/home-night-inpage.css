@@ -191,11 +191,12 @@ html.home3-inpage {
   --snow-pile-start-vh: 5;
   --snow-pile-max-vh: 5;
   --snow-pile-smooth-radius: 0;
-  --snow-pile-bump-scale: 1.45;
+  --snow-pile-bump-scale: 1.65;
   --snow-pile-relief-envelope: 1;
   --snow-pile-spread: 0.06;
   --snow-pile-left-relief: 1.55;
-  --snow-pile-right-relief: 1.2;
+  --snow-pile-right-relief: 1.35;
+  --snow-pile-mid-relief: 1.4;
   --home3-title-glow:
     0 0 1px rgba(255, 255, 255, 1),
     0 0 3px rgba(255, 255, 255, 0.98),
