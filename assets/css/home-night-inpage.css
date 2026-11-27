@@ -188,8 +188,8 @@ html.home3-inpage #night-sky-inpage .night-shine-star--6 {
 /* --- Section titles on night: black type + white outer glow (mobile + desktop) --- */
 html.home3-inpage {
   /* Pre-fill to standard max (5vh) so snow is visible without overshooting */
-  --snow-pile-start-vh: 5;
-  --snow-pile-max-vh: 5;
+  --snow-pile-start-vh: 5.25;
+  --snow-pile-max-vh: 5.25;
   --snow-pile-profile: reference;
   --snow-pile-smooth-radius: 1;
   --snow-pile-curve-smooth: 2;
